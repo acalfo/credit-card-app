@@ -1,3 +1,6 @@
+To Install:
+npm install -g ionic
+
 To run:
 
 Navigate to root directory.
