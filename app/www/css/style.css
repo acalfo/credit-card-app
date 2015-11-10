@@ -9,6 +9,10 @@
   margin-top:40px;
 }
 
+.pane {
+  position: fixed;
+}
+
 .splash-page .logo h1 {
   margin-top:30px;
   text-align:center;

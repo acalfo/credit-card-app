@@ -1,0 +1,55 @@
+{
+  "ecmaFeatures": {
+    modules: true
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "globals": {
+    "moment": true,
+    "angular": true
+  },
+  "parser": "babel-eslint",
+  "rules": {
+    "strict": 0,
+    "no-underscore-dangle": 0,                    //eliminate the use of dangling underscores in identifiers
+    "quotes": [ 1, "single"],                     //Use single quotes
+    "comma-dangle":[1, "never"],                  //IE Error:  Object literals: no comma on last prop
+    "valid-jsdoc": 0,                             //Reminds you to fill in all jsdoc params
+    "block-scoped-var": 0,                        //Forces that variables used within their scope (hoisting bugs)
+    "dot-location": [1, "property"],                //Newline . stays on new line. Eg) myPromise /n .then() instead of myPromise. /n then()
+    "eqeqeq": 1,                                  //Forces use of === / !==
+    "no-param-reassign": 1,                       //Doesn't let you reassign values of params
+    "brace-style": [1, "1tbs", { allowSingleLine: true }],  //Forces braces for if statements to be on end of condition: if ( ) {
+    "comma-style": 1,                             //Throws error if commas are like:  1 ,2 ,3
+    "consistent-this": [1, "self"],               //Requires that you use a consistent placeholder 'self' for this
+    "indent": [1, 2],                             //Forces indent to be 2 spaces
+    "newline-after-var": 1,                       //Forces a newline after variable declarations
+    "no-multiple-empty-lines": [1, {max: 2}],
+    "object-curly-spacing": [1, "always"],        //Forces object literal notation to have spaces eg: var o = { prop: val }
+    "operator-assignment": [1, "always"],         //Use operators in shorthand when possible:   x += y
+    "operator-linebreak": [1, "after"],           //has + operator used on same line   eg. line1 +  /n line2 + /n instead of line1 /n + line2 /n ...
+    "camelcase": 0,
+    "no-use-before-define": 0,                    //Dont use variables before they have been defined
+    "no-trailing-spaces": [1, { skipBlankLines: true }],
+    "sort-vars": [0],                             // sort variables within the same declaration block (off by default)
+    "no-mixed-spaces-and-tabs": 1,
+    "no-var": 0,                                  // Use let instead
+    "vars-on-top": 1,
+    "no-unused-expressions": 1,
+    "space-before-function-paren": 0,
+    "spaced-comment": [0, "never", { exceptions: ["*", "-"] }],  // Temporarily disabling this test as there's a bug with it (https://github.com/eslint/eslint/issues/3276)
+    "no-undefined": 0,                            //Lets you use undefined
+    "space-infix-ops": 1,
+    "no-warning-comments": 1,                     //Shows TODO or FIXME keywords in build as warnings
+    "key-spacing": 1,
+    "no-unused-vars": 1,
+    "no-ternary": 0,
+    "comma-spacing": 1,
+    "no-else-return": 0,
+    "no-nested-ternary": 0,
+    "complexity": 0
+  }
+}

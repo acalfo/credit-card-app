@@ -1,23 +1,23 @@
-angular.module('app.services', [])
-  .factory('MyData', function($http) {
-    // Open a WebSocket connection
-    var dataStream;
-    // var ws = $websocket('ws://html5rocks.websocket.org/echo', $http);
+// angular.module('app.services', [])
 
-    // var collection = [];
+// .factory('Socket',function(socketFactory){
+//     //Create socket and connect to http://chat.socket.io
+//      var myIoSocket = io.connect('http://localhost:9000');
 
-    // dataStream.onMessage(function(message) {
-    //   collection.push(JSON.parse(message.data));
-    // });
+//       mySocket = socketFactory({
+//         ioSocket: myIoSocket
+//       });
 
-    // var methods = {
-    //   collection: collection,
-    //   get: function() {
-    //     dataStream.send(JSON.stringify({
-    //       action: 'get'
-    //     }));
-    //   }
-    //  };
-    return "hallo";
-    //return methods;
-  });
+//     return mySocket;
+// })
+
+
+// .service('AuthenticationService', function(Socket) {
+
+//   var token;
+
+//   this.login = function(user) {
+//     console.log('here!', user);
+//     console.log(Socket);
+//   };
+// });

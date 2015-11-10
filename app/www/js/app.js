@@ -5,72 +5,126 @@
 // the 2nd parameter is an array of 'requires'
 angular.module('app', [
   'ionic',
-  'app.controllers'
+  'btford.socket-io'
 ])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if (window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-    }
-    if (window.StatusBar) {
-      StatusBar.styleDefault();
-    }
+
+  .config(function($stateProvider, $urlRouterProvider, $compileProvider, $ionicConfigProvider) {
 
 
-  });
-})
+    //Changing imgSrcSanitizationWhiteList from current to new config
+    //This lets us render images w/ csrf restrictions enabled during local development.
+    var currentImgSrcSanitizationWhitelist = $compileProvider.imgSrcSanitizationWhitelist();
+    var newImgSrcSanitizationWhiteList = currentImgSrcSanitizationWhitelist.toString().slice(0, -1) + '|chrome-extension:' + currentImgSrcSanitizationWhitelist.toString().slice(-1);
 
-.config(function($stateProvider, $urlRouterProvider) {
+    $compileProvider.imgSrcSanitizationWhitelist(newImgSrcSanitizationWhiteList);
 
-  // Ionic uses AngularUI Router, which uses the concept of states.
-  // Learn more here: https://github.com/angular-ui/ui-router.
-  // Set up the various states in which the app can be.
-  // Each state's controller can be found in controllers.js.
-  $stateProvider
+    $stateProvider
+    // Set up an abstract state for the tabs directive:
+    .state('auth', {
+      url: '/auth',
+      abstract: true,
+      templateUrl: 'templates/auth.html',
+      controller: 'authController'
+    })
 
+    .state('auth.login', {
+      url: '/login',
+      views: {
+        'auth-login': {
+          templateUrl: 'templates/login.html',
+          controller: 'loginController'
+        }
+      }
+    })
 
-  // Set up an abstract state for the tabs directive:
+    .state('auth.signup', {
+      url: '/signup',
+      views: {
+        'auth-signup': {
+          templateUrl: 'templates/signup.html',
+          controller: 'signupController'
+        }
+      }
+    })
+
+    // Set up an abstract state for the tabs directive:
     .state('tab', {
-    url: '/tab',
-    abstract: true,
-    templateUrl: 'templates/tabs.html',
-    controller: 'TabsCtrl'
+      url: '/tab',
+      abstract: true,
+      templateUrl: 'templates/tabs.html',
+      controller: 'tabsController'
+    })
+
+    // Each tab has its own nav history stack:
+    .state('tab.account', {
+      url: '/account',
+      views: {
+        'tab-account': {
+          templateUrl: 'templates/account.html',
+          controller: 'accountController'
+        }
+      }
+    })
+
+
+    .state('tab.pay', {
+      url: '/pay',
+      views: {
+        'tab-pay': {
+          templateUrl: 'templates/pay.html',
+          controller: 'payController'
+        }
+      }
+    })
+
+    .state('tab.receive', {
+      url: '/receive',
+      views: {
+        'tab-receive': {
+          templateUrl: 'templates/receive.html',
+          controller: 'receiveController'
+        }
+      }
+    });
+    // If none of the above states are matched, use this as the fallback:
+    $urlRouterProvider.otherwise('/auth/login');
+
   })
 
-  // Each tab has its own nav history stack:
+  .run(['$rootScope', '$state', 'AuthenticationService',
+    function($rootScope, $state, AuthenticationService) {
 
-  .state('tab.discover', {
-    url: '/discover',
-    views: {
-      'tab-discover': {
-        templateUrl: 'templates/discover.html',
-        controller: 'DiscoverCtrl'
-      }
-    }
-  })
+      $rootScope.$on('$stateChangeStart', function(event, toState) {
 
-  .state('tab.favorites', {
-    url: '/favorites',
-    views: {
-      'tab-favorites': {
-        templateUrl: 'templates/favorites.html',
-        controller: 'FavoritesCtrl'
-      }
+        var doRedirectToAuth = !AuthenticationService.isAuthenticated() &&
+                                toState.name.indexOf('tab') !== -1;
+        var doRedirectToTabs = AuthenticationService.isAuthenticated() &&
+                                toState.name.indexOf('auth') !== -1;
+
+        if (doRedirectToAuth) {
+          event.preventDefault();
+          $state.go('auth.login');
+        }
+
+
+        if (doRedirectToTabs) {
+          event.preventDefault();
+          $state.go('tab.account');
+        }
+      });
     }
+  ])
+
+  .run(function($ionicPlatform) {
+    $ionicPlatform.ready(function() {
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      if (window.cordova && window.cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+      }
+      if (window.StatusBar) {
+        StatusBar.styleDefault();
+      }
+    });
   });
-  // If none of the above states are matched, use this as the fallback:
-  $urlRouterProvider.otherwise('/tab/discover');
-
-})
-
-//  CHANGE THIS TO OUR SERVER LATER
-.constant('SERVER', {
-  // Local server
-  //url: 'http://localhost:3000'
-
-  // Public Heroku server
-  url: 'https://ionic-songhop.herokuapp.com'
-});
