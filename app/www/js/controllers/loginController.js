@@ -15,10 +15,11 @@ angular.module('app')
               console.info('user authenticated');
               $state.go('tab.account');
             } else {
-              $scope.error = 'Error Message';
+              $scope.error = response.error;
             }
           }, function(error) {
-            $scope.error = error.errorMessage;
+            console.log(error);
+            $scope.error = error.errorMessage || error.error;
           }
         );
     };

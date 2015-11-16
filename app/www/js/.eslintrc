@@ -9,7 +9,9 @@
   },
   "globals": {
     "moment": true,
-    "angular": true
+    "angular": true,
+    "cordova": true,
+    "StatusBar": true
   },
   "parser": "babel-eslint",
   "rules": {
@@ -26,7 +28,7 @@
     "comma-style": 1,                             //Throws error if commas are like:  1 ,2 ,3
     "consistent-this": [1, "self"],               //Requires that you use a consistent placeholder 'self' for this
     "indent": [1, 2],                             //Forces indent to be 2 spaces
-    "newline-after-var": 1,                       //Forces a newline after variable declarations
+    "newline-after-var": 0,                       //Forces a newline after variable declarations
     "no-multiple-empty-lines": [1, {max: 2}],
     "object-curly-spacing": [1, "always"],        //Forces object literal notation to have spaces eg: var o = { prop: val }
     "operator-assignment": [1, "always"],         //Use operators in shorthand when possible:   x += y
@@ -37,7 +39,7 @@
     "sort-vars": [0],                             // sort variables within the same declaration block (off by default)
     "no-mixed-spaces-and-tabs": 1,
     "no-var": 0,                                  // Use let instead
-    "vars-on-top": 1,
+    "vars-on-top": 0,
     "no-unused-expressions": 1,
     "space-before-function-paren": 0,
     "spaced-comment": [0, "never", { exceptions: ["*", "-"] }],  // Temporarily disabling this test as there's a bug with it (https://github.com/eslint/eslint/issues/3276)

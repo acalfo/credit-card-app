@@ -5,12 +5,12 @@
 // the 2nd parameter is an array of 'requires'
 angular.module('app', [
   'ionic',
-  'btford.socket-io'
+  'btford.socket-io',
+  'monospaced.qrcode'
 ])
 
 
-  .config(function($stateProvider, $urlRouterProvider, $compileProvider, $ionicConfigProvider) {
-
+  .config(function($stateProvider, $urlRouterProvider, $compileProvider) {
 
     //Changing imgSrcSanitizationWhiteList from current to new config
     //This lets us render images w/ csrf restrictions enabled during local development.
@@ -20,7 +20,7 @@ angular.module('app', [
     $compileProvider.imgSrcSanitizationWhitelist(newImgSrcSanitizationWhiteList);
 
     $stateProvider
-    // Set up an abstract state for the tabs directive:
+    // Set up an abstract state for auth:
     .state('auth', {
       url: '/auth',
       abstract: true,
@@ -48,7 +48,7 @@ angular.module('app', [
       }
     })
 
-    // Set up an abstract state for the tabs directive:
+    // Set up an abstract state for the tabs:
     .state('tab', {
       url: '/tab',
       abstract: true,
@@ -64,6 +64,24 @@ angular.module('app', [
           templateUrl: 'templates/account.html',
           controller: 'accountController'
         }
+      },
+      resolve: {
+        accountData: function($q, $state, $timeout, SocketService, AuthenticationService) {
+          return $q(function(resolve, reject) {
+            var errorCallback = $timeout(function() {
+              console.log('error getting home');
+              AuthenticationService.notAuthenticated();
+              $state.go('auth.login');
+              reject();
+            }, 3000);
+            var successCallback = function(home) {
+              $timeout.cancel( errorCallback );
+              resolve(home);
+            };
+            console.log('sup');
+            return SocketService.getHome(successCallback);
+          });
+        }
       }
     })
 
@@ -75,18 +93,70 @@ angular.module('app', [
           templateUrl: 'templates/pay.html',
           controller: 'payController'
         }
+      },
+      resolve: {
+        payData: function($q, $state, $timeout, SocketService) {
+          return $q(function(resolve, reject) {
+            var errorCallback = $timeout(function() {
+              console.log('error getting pay data.');
+              $state.go('tab.account');
+              reject();
+            }, 3000);
+            var successCallback = function(payData) {
+              $timeout.cancel( errorCallback );
+              resolve(payData);
+            };
+            console.log('sup');
+            return SocketService.getPayData(successCallback);
+          });
+        }
       }
     })
 
-    .state('tab.receive', {
-      url: '/receive',
+    .state('tab.receiveSetPayment', {
+      url: '/receive-set-payment',
       views: {
         'tab-receive': {
-          templateUrl: 'templates/receive.html',
-          controller: 'receiveController'
+          templateUrl: 'templates/receiveSetPayment.html',
+          controller: 'receiveSetPaymentController'
+        }
+      }
+    })
+
+    .state('tab.receivePayment', {
+      url: '/receive-payment',
+      views: {
+        'tab-receive': {
+          templateUrl: 'templates/receivePayment.html',
+          controller: 'receivePaymentController'
+        }
+      },
+      params: {
+        amount: null
+      },
+      resolve: {
+        receiveData: function($q, $state, $stateParams, $timeout, SocketService) {
+          return $q(function(resolve, reject) {
+            var errorCallback = $timeout(function() {
+              console.log('error getting pay data.');
+              $state.go('tab.account');
+              reject();
+            }, 3000);
+            var successCallback = function(receiveData) {
+              $timeout.cancel( errorCallback );
+              resolve(receiveData);
+            };
+            // handle rest of validation in controller sending payment.
+            if ( !$stateParams.amount ) {
+              $state.go('tab.receiveSetPayment');
+            }
+
+            return SocketService.getReceiveData(successCallback);
+          });
         }
       }
     });
+
     // If none of the above states are matched, use this as the fallback:
     $urlRouterProvider.otherwise('/auth/login');
 

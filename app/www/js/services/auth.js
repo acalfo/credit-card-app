@@ -1,46 +1,73 @@
 angular.module('app')
 
   .service('AuthenticationService', ['$http', '$q', '$timeout', 'SocketService', function($http, $q, $timeout, SocketService) {
-    var token;
-    var isAuthenticated = false;
+    var auth = {
+      token: undefined,
+      isAuthenticated: false
+    };
+    var timer;
+    var activeUser;
 
     this.login = function(user) {
-      var timer;
-
       return $q(function(resolve, reject) {
         timer = $timeout(function() {
-          isAuthenticated = false;
+          auth.isAuthenticated = false;
           reject({ errorMessage: 'Socket Timeout' });
         }, 10000);
+
         $http
           .post('http://localhost:9000/login', user)
           .success(function (data) {
-            // Connect Socket!
-            var socket = SocketService.connect();
+            if (data.error) {
+              $timeout.cancel( timer );
+              return reject(data.error);
+            }
+            var successCallback = function() {
+              activeUser = user;
+              auth.isAuthenticated = true;
+              $timeout.cancel( timer );
 
-            token = data.token.trim();
+              resolve({ 'success': true });
+            };
 
-            socket.on('connect', function () {
-              socket.on('authenticated', function () {
-                console.log('Authenticated. Getting Home.');
-                isAuthenticated = true;
-                $timeout.cancel( timer );
+            return authenticate(data.token, successCallback);
+          })
+          .error(function () {
+            $timeout.cancel( timer );
 
-                resolve({ 'success': true });
-                // Do this in resolved tabs route.
+            // Erase the token if the user fails to log in
+            auth.token = undefined;
+            auth.isAuthenticated = false;
 
-                // socket.on('home', function(socket) {
-                //   console.log('IN HOME! Socket: ', socket);
-                // })
-                // .emit('getHome', {token: token});
-              })
-              .emit('authenticate', { token: token }); //send the jwt
-            });
+            reject({ errorMessage: 'This is an error message.' });
+          });
+      });
+    };
+
+    this.signup = function(newUser) {
+      return $q(function(resolve, reject) {
+        timer = $timeout(function() {
+          auth.isAuthenticated = false;
+          reject({ errorMessage: 'Socket Timeout' });
+        }, 10000);
+
+        $http
+          .post('http://localhost:9000/sign-up', newUser)
+          .success(function (data) {
+            var successCallback = function() {
+              activeUser = newUser;
+              auth.isAuthenticated = true;
+              $timeout.cancel( timer );
+
+              resolve({ 'success': true });
+            };
+
+            return authenticate(data.token, successCallback);
           })
           .error(function () {
             // Erase the token if the user fails to log in
-            token = undefined;
-            isAuthenticated = false;
+            auth.token = undefined;
+            auth.isAuthenticated = false;
 
             reject({ errorMessage: 'This is an error message.' });
           });
@@ -48,7 +75,23 @@ angular.module('app')
     };
 
     this.isAuthenticated = function() {
-      return isAuthenticated;
+      return auth.isAuthenticated;
+    };
+
+    this.notAuthenticated = function() {
+      auth.isAuthenticated = false;
+    };
+
+    this.getUser = function() {
+      return activeUser;
+    };
+
+    var authenticate = function(token, successCallback) {
+      auth.token = token.trim();
+
+      // Connect Socket & Authenticate!
+      return SocketService.connect()
+              .authenticate(auth, successCallback);
     };
   }
 ]);

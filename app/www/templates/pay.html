@@ -1,11 +1,14 @@
 <ion-view view-title="Pay from Credit" class="discover-page">
   <ion-content scroll="false">
+    <div style="margin-top:3rem;">
+      <!-- <svg style="height:274px; width:274px;" template="qrCode"></svg> -->
+      <qrcode class="qr-svg" error-correction-level="H" data="payData" version="32" size="274"></qrcode>
 
-  <br />
-    QR Code Goes Here
-  <br /> <br />
-  Text @ bottom w/ instructions
+      <div style="text-align:center; margin-top:5rem;">
+        TODO: Text @ bottom w/ instructions
+        <button ng-click="testReceive()"> TEST RECEIVE </button>
+      </div>
 
-
+    </div>
   </ion-content>
 </ion-view>

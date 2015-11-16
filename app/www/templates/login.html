@@ -10,6 +10,8 @@
           <span class="input-label">Password</span>
           <input type="password" placeholder="At least 6 characters" ng-model="data.password">
         </label>
+        <!-- TODO ERROR HANDLING -->
+        {{error}}
       </ion-list>
       <button class="button button-stable button-block" ng-click="login()">Done</button>
     </form>
